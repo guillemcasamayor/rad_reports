@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador de Informe Estructurado - Estudios Baritados</title>
+    <!-- Importamos la fuente Ubuntu -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --container-bg: #131a26;
+            --accent-blue: #2563eb;
+            --dark-blue-title: #1d4ed8;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #1e293b;
+            --input-bg: #1e293b;
+            --input-border: #334155;
+            --danger-color: #ef4444;
+            --danger-bg: #451a1a;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .layout-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1024px) {
+            .layout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Columna de Formulario e Informe */
+        .main-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Columna de Soporte de Imágenes */
+        .sidebar-column {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        h1 {
+            color: var(--dark-blue-title);
+            font-size: 24px;
+            margin-bottom: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h2 {
+            color: var(--dark-blue-title);
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 5px;
+            font-weight: 500;
+        }
+
+        h3 {
+            color: #3b82f6;
+            font-size: 14px;
+            margin: 15px 0 8px 0;
+            font-weight: 500;
+        }
+
+        .panel {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        /* Grid de controles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        select, input[type="text"], textarea {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-main);
+            font-family: 'Ubuntu', sans-serif;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input[type="text"]:focus, textarea:focus {
+            border-color: var(--accent-blue);
+        }
+
+        /* Radios y Checkboxes estilizados */
+        .radio-group, .checkbox-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 5px 0;
+        }
+
+        .radio-item, .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .radio-item input, .checkbox-item input {
+            accent-color: var(--accent-blue);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* Secciones condicionales con transición suave */
+        .conditional-section {
+            display: none;
+            border-left: 3px solid var(--accent-blue);
+            padding-left: 15px;
+            margin-top: 15px;
+        }
+
+        .danger-zone {
+            background-color: var(--danger-bg);
+            border: 1px solid var(--danger-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 15px;
+        }
+
+        /* Área de resultado */
+        .output-box {
+            background-color: #05070b;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Ubuntu', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            min-height: 200px;
+            color: #e2e8f0;
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--dark-blue-title);
+        }
+
+        button.secondary {
+            background-color: #334155;
+        }
+
+        button.secondary:hover {
+            background-color: #475569;
+        }
+
+        /* Bloques de la columna derecha (imágenes) */
+        .image-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .image-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            border: 1px dashed var(--input-border);
+            border-radius: 4px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--success-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: none;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-container">
+        
+        <!-- COLUMNA PRINCIPAL: CONFIGURACIÓN E INFORME -->
+        <div class="main-column">
+            
+            <div class="panel">
+                <h1>PACS Guerrilla - Informes Baritados</h1>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Estructuración dinámica para Esofagograma y TEGD</p>
+                
+                <h2>1. Datos del Estudio y Configuración Inicial</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tipo de Exploración</label>
+                        <select id="tipo_estudio" onchange="toggleSecciones(); generarInforme();">
+                            <option value="esofagograma">Esofagograma estándar</option>
+                            <option value="tegd">Tránsito Esofagogastroduodenal (TEGD)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contraste Utilizado</label>
+                        <select id="contraste" onchange="generarInforme()">
+                            <option value="Bario susp. oral">Bario</option>
+                            <option value="Contraste hidrosoluble yodado">Contraste Hidrosoluble (Sospecha de fuga/aspiración)</option>
+                            <option value="Doble contraste (Bario + gas)">Doble Contraste</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Indicación Clínica</label>
+                        <input type="text" id="indicacion" value="Disfagia en estudio" oninput="generarInforme()">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>¿Es un control Postquirúrgico o Postintervencionismo?</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="postquirurgico" value="no" checked onchange="togglePostquirurgico(false); generarInforme();"> No
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="postquirurgico" value="si" onchange="togglePostquirurgico(true); generarInforme();"> Sí, evaluar procedimiento
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN DINÁMICA POSTQUIRÚRGICA -->
+                <div id="sec_postquirurgico" class="conditional-section">
+                    <h3>Evaluación del Contexto Postquirúrgico</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tipo de Intervención</label>
+                            <select id="tipo_cirugia" onchange="toggleTipoCirugia(); generarInforme();">
+                                <option value="poems">POEMS / Miotomía de Heller</option>
+                                <option value="antirreflujo">Funduplicatura (Nissen / Toupet)</option>
+                                <option value="bariátrica_sleeve">Cirugía Bariátrica - Sleeve (Manga)</option>
+                                <option value="bariátrica_bypass">Cirugía Bariátrica - Bypass Y de Roux</option>
+                                <option value="oncologica">Esofaguectomía / Gastrectomía Mayor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Campos específicos POEMS -->
+                    <div id="campos_poems" class="cirugia-especifica" style="display:none; margin-top:10px;">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Paso por la UGE</label>
+                                <select id="poems_uge" onchange="generarInforme()">
+                                    <option value="Libre y continuo, apreciándose apertura adecuada de la unión gastroesofágica.">Libre y continuo</option>
+                                    <option value="Retrasado con persistencia de afilamiento distal en 'pico de pájaro'.">Retrasado / Afilado</option>
+                                    <option value="Ausente o críticamente enlentecido.">Obstrucción fija</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Estudio Minutado (Aclaramiento)</label>
+                                <select id="poems_minutado" onchange="generarInforme()">
+                                    <option value="Aclaramiento completo del contraste a los 5 minutos.">Completo a los 5 min</option>
+                                    <option value="Retención significativa del contraste en esófago torácico a los 5 minutos.">Retención a los 5 min</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campos específicos Antirreflujo -->
+                    <div id="campos_antirreflujo" class="cirugia-especifica" style="display:none; margin-top:10px;">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Morfología de la Funduplicatura</label>
+                                <select id="ni_manguito" onchange="generarInforme()">
+                                    <option value="Manguito de funduplicatura normoposicionado bajo el diafragma, sin improntas patológicas.">Normoposicionado (Intraabdominal)</option>
+                                    <option value="Signos de funduplicatura deshecha o rota.">Deshecha / Rota</option>
+                                    <option value="Funduplicatura deslizada a la cavidad intratorácica.">Deslizada (Intratorácica)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Paso del Contraste</label>
+                                <select id="ni_paso" onchange="generarInforme()">
+                                    <option value="Paso del contraste fluido y adecuado, sin estenosis significativas.">Fluido y adecuado</option>
+                                    <option value="Tránsito dificultoso o retrasado a nivel del manguito.">Retrasado / Estenosis funcional</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campos específicos Sleeve -->
+                    <div id="campos_sleeve" class="cirugia-especifica" style="display:none; margin-top:10px;">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Morfología del Tubo Gástrico</label>
+                                <select id="sl_morfologia" onchange="generarInforme()">
+                                    <option value="Tubulización gástrica uniforme de calibre conservado.">Uniforme y normal</option>
+                                    <option value="Dilatación sacular remanente en la región del neofundus.">Dilatación sacular / Neofundus</option>
+                                    <option value="Signos de torsión ('twisting') del tubo gástrico que dificulta el paso.">Torsión (Twisting)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campos específicos Bypass -->
+                    <div id="campos_bypass" class="cirugia-especifica" style="display:none; margin-top:10px;">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Pouch Gástrico y Anastomosis</label>
+                                <select id="by_pouch" onchange="generarInforme()">
+                                    <option value="Pouch gástrico de tamaño adecuado con evacuación libre a través de la anastomosis gastroentérica.">Normal, evacuación libre</option>
+                                    <option value="Pouch gástrico dilatado con retraso en el vaciamiento.">Pouch dilatado</option>
+                                    <option value="Estenosis a nivel de la anastomosis gastroentérica.">Estenosis de la anastomosis</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Zona Alerta Complicaciones Críticas -->
+                    <div class="danger-zone">
+                        <label style="color: #fca5a5; font-weight: bold; font-size:13px;">⚠️ COMPLICACIONES INMEDIATAS</label>
+                        <div class="checkbox-group" style="margin-top: 8px;">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="comp_fuga" onchange="generarInforme()"> Fuga / Extravasación de contraste
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="comp_fistula" onchange="generarInforme()"> Presencia de trayecto fistuloso
+                            </label>
+                        </div>
+                        <input type="text" id="comp_detalles" placeholder="Detalles de la localización exacta de la complicación..." style="width:100%; margin-top:10px; display:none;" oninput="generarInforme()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANATOMÍA ESTÁNDAR (PANELES MODULARES) -->
+            <div class="panel">
+                <h2>2. Hallazgos Morfológicos y Funcionales</h2>
+                
+                <h3>Fase Faringoesofágica y Tránsito Esofágico</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Mecanismo de Deglución</label>
+                        <select id="fase_oral" onchange="generarInforme()">
+                            <option value="Mecanismo de la deglución coordinado, sin signos de penetración ni aspiración a la vía aérea.">Normal coordinado</option>
+                            <option value="Incoordinación cricofaríngea con estasis en senos piriformes.">Incoordinación cricofaríngea</option>
+                            <option value="Evidencia de penetración laríngea sin rebasar las cuerdas vocales verdaderas.">Penetración laríngea</option>
+                            <option value="Aspiración franca a la vía aérea traqueobronquial.">Aspiración vía aérea</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Motilidad Esofágica (Cuerpo)</label>
+                        <select id="motilidad" onchange="generarInforme()">
+                            <option value="Ondas peristálticas primarias progresivas y eficaces que limpian el bolo adecuadamente.">Peristaltismo normal</option>
+                            <option value="Presencia de ondas terciarias no propulsivas (presbiesófago / espasmo).">Ondas terciarias frecuentes</option>
+                            <option value="Aperistalsis completa del cuerpo esofágico.">Aperistalsis completa</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Calibre y Mucosa Esofágica</label>
+                        <select id="mucosa_esofago" onchange="generarInforme()">
+                            <option value="Calibre regular, con pliegues mucosos de características normales.">Normal, regular</option>
+                            <option value="Estenosis de márgenes regulares en tercio distal.">Estenosis regular distal</option>
+                            <option value="Defecto de repleción focal de aspecto polipoideo/masa.">Defecto de repleción (Masa/Pólipo)</option>
+                            <option value="Divertículo por pulsión (especificar localización en texto libre).">Divertículo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Unión Gastroesofágica y Hiato</label>
+                        <select id="uge_hiato" onchange="generarInforme()">
+                            <option value="Unión gastroesofágica situada intraabdominal, sin hernia de hiato ni reflujo gastroesofágico espontáneo o provocado.">Normal, sin hernia ni reflujo</option>
+                            <option value="Hernia de hiato por deslizamiento (pequeño tamaño).">Hernia de hiato por deslizamiento pequeña</option>
+                            <option value="Hernia de hiato por deslizamiento significativa con reflujo gastroesofágico asociado.">Hernia de hiato con reflujo evidente</option>
+                            <option value="Hernia paraesofágica con manguito gástrico intratorácico.">Hernia paraesofágica</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN EXCLUSIVA TEGD (ESTÓMAGO Y DUODENO) -->
+                <div id="sec_tegd_campos" style="display:none;">
+                    <h3>Evaluación Gástrica y Duodenal (Exclusivo TEGD)</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Estómago (Morfología y Vaciamiento)</label>
+                            <select id="tegd_estomago" onchange="generarInforme()">
+                                <option value="Estómago de morfología, distensibilidad y pliegues mucosos normales, con vaciamiento inmediato al duodeno.">Normal, vaciamiento fluido</option>
+                                <option value="Estómago en cascada sin alteraciones parietales intrínsecas.">Estómago en cascada</option>
+                                <option value="Signos de enlentecimiento crítico del vaciamiento gástrico (retención).">Vaciamiento enlentecido</option>
+                                <option value="Nicho de adición sugerente de úlcera gástrica (especificar localización).">Nicho de úlcera gástrica</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Bulbo y Marco Duodenal</label>
+                            <select id="tegd_duodeno" onchange="generarInforme()">
+                                <option value="Bulbo y marco duodenal bien rellenos, de contornos regulares, con libre tránsito hacia las primeras asas yeyunales.">Normal, libre tránsito a yeyuno</option>
+                                <option value="Deformidad crónica del bulbo duodenal por ulcus previo.">Bulbo deformado crónico</option>
+                                <option value="Divertículo duodenal en segunda porción sin signos de complicación.">Divertículo duodenal</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMPRESIÓN DIAGNÓSTICA -->
+            <div class="panel">
+                <h2>3. Impresión Diagnóstica / Conclusión</h2>
+                <div class="form-group full-width">
+                    <textarea id="conclusion" rows="3" style="width: 100%; resize: vertical;" oninput="generarInforme()">Estudio baritado dentro de los límites de la normalidad.</textarea>
+                </div>
+            </div>
+
+            <!-- INFORME GENERADO (LISTO PARA COPIAR AL PACS) -->
+            <div class="panel">
+                <h2>📋 Informe Estructurado Generado (Vista Previa para PACS)</h2>
+                <div id="informe_output" class="output-box"></div>
+                <div class="actions-row">
+                    <button onclick="copiarAlPortapapeles()">Copiar Texto del Informe</button>
+                    <button class="secondary" onclick="resetearFormulario()">Resetear</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- COLUMNA DERECHA: SOPORTE DE IMÁGENES -->
+        <div class="sidebar-column">
+            <h2>🖼️ Soporte de Imágenes</h2>
+            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 15px;">Añade enlaces URL de imágenes de referencia (PACS/Web) para tenerlas accesibles en el panel lateral.</p>
+            
+            <div class="image-slots">
+                <div class="image-card">
+                    <label>Imagen de Referencia 1</label>
+                    <input type="text" id="img_url_1" placeholder="Pegar URL de la imagen aquí..." style="width:100%; margin-top:5px;" oninput="cargarImagen(1)">
+                    <div id="preview_1" class="image-preview">Sin imagen cargada</div>
+                </div>
+
+                <div class="image-card">
+                    <label>Imagen de Referencia 2</label>
+                    <input type="text" id="img_url_2" placeholder="Pegar URL de la imagen aquí..." style="width:100%; margin-top:5px;" oninput="cargarImagen(2)">
+                    <div id="preview_2" class="image-preview">Sin imagen cargada</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Notificación emergente -->
+    <div id="toast" class="toast">¡Informe copiado al portapapeles con éxito!</div>
+
+    <!-- LÓGICA DE JAVASCRIPT -->
+    <script>
+        function toggleSecciones() {
+            const tipoEstudio = document.getElementById('tipo_estudio').value;
+            const secTegd = document.getElementById('sec_tegd_campos');
+            if (tipoEstudio === 'tegd') {
+                secTegd.style.display = 'block';
+            } else {
+                secTegd.style.display = 'none';
+            }
+        }
+
+        function togglePostquirurgico(isPost) {
+            const secPost = document.getElementById('sec_postquirurgico');
+            if (isPost) {
+                secPost.style.display = 'block';
+                toggleTipoCirugia();
+            } else {
+                secPost.style.display = 'none';
+            }
+        }
+
+        function toggleTipoCirugia() {
+            const tipo = document.getElementById('tipo_cirugia').value;
+            // Ocultar todos
+            document.querySelectorAll('.cirugia-especifica').forEach(el => el.style.display = 'none');
+            
+            if (tipo === 'poems') document.getElementById('campos_poems').style.display = 'block';
+            else if (tipo === 'antirreflujo') document.getElementById('campos_antirreflujo').style.display = 'block';
+            else if (tipo === 'bariátrica_sleeve') document.getElementById('campos_sleeve').style.display = 'block';
+            else if (tipo === 'bariátrica_bypass') document.getElementById('campos_bypass').style.display = 'block';
+            
+            // Toggle input de detalles de complicaciones críticas
+            const checkFuga = document.getElementById('comp_fuga').checked;
+            const checkFistula = document.getElementById('comp_fistula').checked;
+            document.getElementById('comp_detalles').style.display = (checkFuga || checkFistula) ? 'block' : 'none';
+        }
+
+        // Listener dinámico para los checkboxes de complicaciones
+        document.getElementById('comp_fuga').addEventListener('change', function() {
+            document.getElementById('comp_detalles').style.display = (this.checked || document.getElementById('comp_fistula').checked) ? 'block' : 'none';
+        });
+        document.getElementById('comp_fistula').addEventListener('change', function() {
+            document.getElementById('comp_detalles').style.display = (this.checked || document.getElementById('comp_fuga').checked) ? 'block' : 'none';
+        });
+
+        function cargarImagen(id) {
+            const url = document.getElementById(`img_url_${id}`).value;
+            const preview = document.getElementById(`preview_${id}`);
+            if (url.trim() !== "") {
+                preview.style.backgroundImage = `url('${url}')`;
+                preview.textContent = "";
+            } else {
+                preview.style.backgroundImage = "none";
+                preview.textContent = "Sin imagen cargada";
+            }
+        }
+
+        function generarInforme() {
+            const tipoEstudio = document.getElementById('tipo_estudio').value.toUpperCase();
+            const contraste = document.getElementById('contraste').value;
+            const indicacion = document.getElementById('indicacion').value;
+            const isPost = document.querySelector('input[name="postquirurgico"]:checked').value === 'si';
+            
+            const faseOral = document.getElementById('fase_oral').value;
+            const motilidad = document.getElementById('motilidad').value;
+            const mucosaEsofago = document.getElementById('mucosa_esofago').value;
+            const ugeHiato = document.getElementById('uge_hiato').value;
+
+            let texto = `INFORME DE RADIOLOGÍA - ESTUDIO CONTRASTADO\n`;
+            texto += `===============================================\n`;
+            texto += `EXPLORACIÓN: ${tipoEstudio}\n`;
+            texto += `TÉCNICA: Administración de ${contraste}.\n`;
+            texto += `INDICACIÓN: ${indicacion}\n\n`;
+            
+            texto += `HALLAZGOS:\n`;
+            texto += `- Fase faringoesofágica: ${faseOral}\n`;
+            texto += `- Cuerpo esofágico (Motilidad): ${motilidad}\n`;
+            texto += `- Morfología y mucosa: ${mucosaEsofago}\n`;
+            texto += `- Unión Gastroesofágica y Hiato: ${ugeHiato}\n`;
+
+            if (isPost) {
+                const tipoCirugia = document.getElementById('tipo_cirugia').options[document.getElementById('tipo_cirugia').selectedIndex].text;
+                texto += `\n[VALORACIÓN POSTQUIRÚRGICA / INTERVENCIONISMO - ${tipoCirugia.toUpperCase()}]\n`;
+                
+                const tipoCirugiaVal = document.getElementById('tipo_cirugia').value;
+                if (tipoCirugiaVal === 'poems') {
+                    texto += `- Paso por la UGE: ${document.getElementById('poems_uge').value}\n`;
+                    texto += `- Estudio minutado: ${document.getElementById('poems_minutado').value}\n`;
+                } else if (tipoCirugiaVal === 'antirreflujo') {
+                    texto += `- Morfología de la funduplicatura: ${document.getElementById('ni_manguito').value}\n`;
+                    texto += `- Paso del contraste: ${document.getElementById('ni_paso').value}\n`;
+                } else if (tipoCirugiaVal === 'bariátrica_sleeve') {
+                    texto += `- Morfología del eje gástrico: ${document.getElementById('sl_morfologia').value}\n`;
+                } else if (tipoCirugiaVal === 'bariátrica_bypass') {
+                    texto += `- Evaluación del Pouch y anastomosis: ${document.getElementById('by_pouch').value}\n`;
+                }
+
+                // Complicaciones graves
+                const f = document.getElementById('comp_fuga').checked;
+                const fi = document.getElementById('comp_fistula').checked;
+                const det = document.getElementById('comp_detalles').value;
+                
+                if (f || fi) {
+                    texto += `- 🚨 COMPLICACIÓN DETECTADA: `;
+                    if (f) texto += `[Extravasación/Fuga de contraste] `;
+                    if (fi) texto += `[Trayecto fistuloso] `;
+                    if (det) texto += `\n  Detalles: ${det}\n`;
+                    else texto += `\n`;
+                } else {
+                    texto += `- Exclusión de complicaciones: No se observan fugas de contraste ni trayectos fistulosos en la exploración actual.\n`;
+                }
+            }
+
+            if (document.getElementById('tipo_estudio').value === 'tegd') {
+                texto += `\n[EVALUACIÓN GÁSTRICA Y DUODENAL (TEGD)]\n`;
+                texto += `- Estómago: ${document.getElementById('tegd_estomago').value}\n`;
+                texto += `- Duodeno: ${document.getElementById('tegd_duodeno').value}\n`;
+            }
+
+            texto += `\nIMPRESIÓN DIAGNÓSTICA:\n`;
+            texto += `${document.getElementById('conclusion').value}`;
+
+            document.getElementById('informe_output').textContent = texto;
+        }
+
+        function copiarAlPortapapeles() {
+            const texto = document.getElementById('informe_output').textContent;
+            navigator.clipboard.writeText(texto).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 2500);
+            });
+        }
+
+        function resetearFormulario() {
+            document.getElementById('indicacion').value = "Disfagia en estudio";
+            document.getElementById('tipo_estudio').value = "esofagograma";
+            document.getElementById('contraste').value = "Bario susp. oral";
+            document.querySelector('input[name="postquirurgico"][value="no"]').checked = true;
+            document.getElementById('comp_fuga').checked = false;
+            document.getElementById('comp_fistula').checked = false;
+            document.getElementById('comp_detalles').value = "";
+            document.getElementById('conclusion').value = "Estudio baritado dentro de los límites de la normalidad.";
+            togglePostquirurgico(false);
+            toggleSecciones();
+            generarInforme();
+        }
+
+        // Inicializar el informe al cargar la página
+        window.onload = function() {
+            generarInforme();
+        };
+    </script>
+</body>
+</html>
