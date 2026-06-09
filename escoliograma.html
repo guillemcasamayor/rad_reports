@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Estructurado de Escoliograma - Blue & Black Theme</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* TEMA NEGRO, BLANCO Y AZUL */
+        body { 
+            font-family: 'Ubuntu', sans-serif; 
+            background-color: #000000; 
+            color: #ffffff; 
+            margin: 0; 
+            padding: 20px; 
+            box-sizing: border-box;
+        }
+        
+        h1 { color: #66b2ff; text-align: center; border-bottom: 2px solid #1a1a1a; padding-bottom: 10px; margin-bottom: 30px;}
+        h2 { color: #3399ff; font-size: 1.1em; margin-top: 20px; border-bottom: 1px solid #1a1a1a; padding-bottom: 5px; }
+        h3 { color: #99ccff; font-size: 1em; margin-bottom: 5px;}
+        
+        /* LAYOUT A DOS COLUMNAS */
+        .main-wrapper { display: flex; gap: 30px; max-width: 1400px; margin: auto; }
+        .form-panel, .guide-panel { 
+            background-color: #0a0a0a; 
+            padding: 25px; 
+            border-radius: 8px; 
+            border: 1px solid #1a1a1a;
+        }
+        .form-panel { flex: 1.2; }
+        .guide-panel { flex: 0.8; height: fit-content; position: sticky; top: 20px; border-left: 3px solid #3399ff;}
+
+        /* ESTILOS DE FORMULARIO */
+        .form-group { margin-bottom: 15px; }
+        label { font-weight: 500; display: block; margin-bottom: 5px; font-size: 0.9em; color: #cccccc;}
+        input[type="text"], input[type="number"], select, textarea { 
+            width: 100%; padding: 8px; 
+            background-color: #111111; color: #ffffff; 
+            border: 1px solid #333333; border-radius: 4px; 
+            box-sizing: border-box; font-family: 'Ubuntu', sans-serif;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #66b2ff; }
+        .row { display: flex; gap: 15px; }
+        .col { flex: 1; }
+        
+        /* BOTONES Y CHECKBOX */
+        .checkbox-group { 
+            display: flex; align-items: center; gap: 10px; margin: 15px 0; padding: 12px; 
+            background-color: #0f1926; border-radius: 5px; border-left: 4px solid #3399ff; 
+        }
+        .checkbox-group.normal-toggle { 
+            background-color: #001a33; border-left: 4px solid #66b2ff; 
+        } 
+        .checkbox-group label { margin-bottom: 0; cursor: pointer; color: #ffffff; font-weight: bold;}
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        
+        /* Secciones ocultables */
+        .collapsible-section { padding-left: 15px; border-left: 2px solid #1a334d; margin-bottom: 20px; display: none; }
+        #secondaryCurveSection { padding: 15px; background-color: #0a0a0a; border: 1px dashed #333333; border-radius: 5px; margin-bottom: 15px; display: none; }
+        
+        .btn-group { display: flex; gap: 15px; margin-top: 20px; }
+        button { 
+            font-family: 'Ubuntu', sans-serif; border: none; padding: 12px 20px; 
+            font-size: 1.1em; font-weight: bold; border-radius: 5px; cursor: pointer; 
+            display: block; width: 100%; transition: background-color 0.3s;
+        }
+        .btn-primary { background-color: #005ce6; color: white; }
+        .btn-primary:hover { background-color: #0047b3; }
+        .btn-reset { background-color: #1a1a1a; color: #99ccff; border: 1px solid #333333;}
+        .btn-reset:hover { background-color: #262626; color: #ffffff;}
+        .success-msg { color: #66b2ff; text-align: center; margin-top: 10px; display: none; font-weight: bold;}
+
+        /* ESTILOS DE LA GUÍA */
+        .guide-panel p { font-size: 0.9em; line-height: 1.5; color: #cccccc;}
+        .guide-img { width: 100%; max-width: 300px; display: block; margin: 10px auto; border-radius: 4px; border: 1px solid #333333; background-color: #fff; padding: 5px;}
+    </style>
+</head>
+<body onload="initForm()">
+
+<h1>Informe Estructurado: Escoliograma</h1>
+
+<div class="main-wrapper">
+    <div class="form-panel">
+        <form id="scoliosisForm">
+            <h2>1. Datos de la Exploración</h2>
+            <div class="form-group">
+                <select id="proyecciones">
+                    <option value="Proyecciones AP y Lateral de columna total en bipedestación">AP y Lateral en bipedestación</option>
+                    <option value="Proyecciones PA y Lateral de columna total en bipedestación">PA y Lateral en bipedestación (Baja dosis)</option>
+                    <option value="Proyecciones AP/PA, Lateral y test de inclinación (Bending)">AP/PA, Lateral + Inclinaciones (Bending)</option>
+                </select>
+            </div>
+
+            <h2>2. Plano Coronal: Curvas</h2>
+            <div class="checkbox-group normal-toggle">
+                <input type="checkbox" id="checkNormalCoronal" onchange="toggleSections()" checked>
+                <label for="checkNormalCoronal">Plano Coronal Normal (Cobb < 10º, asimetría no estructurada)</label>
+            </div>
+            
+            <div id="coronalSection" class="collapsible-section">
+                <h3>Curva Principal (Mayor)</h3>
+                <div class="row">
+                    <div class="col form-group">
+                        <label>Ubicación:</label>
+                        <select id="ubicacion_1">
+                            <option value="Torácica">Torácica</option><option value="Toracolumbar">Toracolumbar</option><option value="Lumbar">Lumbar</option>
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <label>Convexidad:</label>
+                        <select id="convexidad_1"><option value="Derecha">Derecha</option><option value="Izquierda">Izquierda</option></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col form-group"><label>Límite Sup.:</label><input type="text" id="limite_sup_1" placeholder="Ej. T4"></div>
+                    <div class="col form-group"><label>Vértice (Apical):</label><input type="text" id="apical_1" placeholder="Ej. T8"></div>
+                    <div class="col form-group"><label>Límite Inf.:</label><input type="text" id="limite_inf_1" placeholder="Ej. T12"></div>
+                </div>
+                <div class="row">
+                    <div class="col form-group"><label>Ángulo de Cobb (º):</label><input type="number" id="cobb_1" placeholder="Ej. 35"></div>
+                    <div class="col form-group">
+                        <label>Rotación (Nash-Moe):</label>
+                        <select id="rotacion_1">
+                            <option value="Grado 0">Grado 0</option><option value="Grado I">Grado I</option>
+                            <option value="Grado II">Grado II</option><option value="Grado III">Grado III</option><option value="Grado IV">Grado IV</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="checkbox-group" style="background-color: #0a141f; border-left: 4px solid #3399ff;">
+                    <input type="checkbox" id="checkSecondaryCurve" onchange="toggleSecondary()">
+                    <label for="checkSecondaryCurve">Añadir curva secundaria / compensatoria</label>
+                </div>
+
+                <div id="secondaryCurveSection">
+                    <h3>Curva Secundaria (Menor)</h3>
+                    <div class="row">
+                        <div class="col form-group">
+                            <label>Ubicación:</label>
+                            <select id="ubicacion_2"><option value="Lumbar">Lumbar</option><option value="Toracolumbar">Toracolumbar</option><option value="Torácica">Torácica</option></select>
+                        </div>
+                        <div class="col form-group">
+                            <label>Convexidad:</label>
+                            <select id="convexidad_2"><option value="Izquierda">Izquierda</option><option value="Derecha">Derecha</option></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col form-group"><label>Límite Sup.:</label><input type="text" id="limite_sup_2" placeholder="Ej. L1"></div>
+                        <div class="col form-group"><label>Vértice (Apical):</label><input type="text" id="apical_2" placeholder="Ej. L3"></div>
+                        <div class="col form-group"><label>Límite Inf.:</label><input type="text" id="limite_inf_2" placeholder="Ej. L5"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col form-group"><label>Ángulo de Cobb (º):</label><input type="number" id="cobb_2" placeholder="Ej. 25"></div>
+                        <div class="col form-group">
+                            <label>Rotación:</label>
+                            <select id="rotacion_2">
+                                <option value="Grado 0">Grado 0</option><option value="Grado I">Grado I</option>
+                                <option value="Grado II">Grado II</option><option value="Grado III">Grado III</option><option value="Grado IV">Grado IV</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>3. Balance Global y Pelvis</h2>
+            <div class="checkbox-group normal-toggle">
+                <input type="checkbox" id="checkNormalBalance" onchange="toggleSections()" checked>
+                <label for="checkNormalBalance">Balance compensado y pelvis nivelada</label>
+            </div>
+            
+            <div id="balanceSection" class="collapsible-section">
+                <div class="row">
+                    <div class="col form-group">
+                        <label>Alineación C7-CSVL:</label>
+                        <select id="eje_coronal">
+                            <option value="Centrado (Compensado)">Centrado (Compensado)</option>
+                            <option value="Desviado a la derecha">Desviado a la derecha</option>
+                            <option value="Desviado a la izquierda">Desviado a la izquierda</option>
+                        </select>
+                    </div>
+                    <div class="col form-group"><label>Desviación (mm):</label><input type="number" id="eje_mm" placeholder="Ej. 15"></div>
+                </div>
+                <div class="row">
+                    <div class="col form-group">
+                        <label>Báscula Pélvica:</label>
+                        <select id="bascula_estado">
+                            <option value="Pelvis nivelada">Pelvis nivelada</option>
+                            <option value="Desnivelada (Cresta derecha más baja)">Derecha más baja</option>
+                            <option value="Desnivelada (Cresta izquierda más baja)">Izquierda más baja</option>
+                        </select>
+                    </div>
+                    <div class="col form-group"><label>Disimetría (mm):</label><input type="number" id="bascula_mm" placeholder="Ej. 12"></div>
+                </div>
+            </div>
+            
+            <h2>4. Plano Sagital</h2>
+            <div class="checkbox-group normal-toggle">
+                <input type="checkbox" id="checkNormalSagital" onchange="toggleSections()" checked>
+                <label for="checkNormalSagital">Plano Sagital Normal (Curvas fisiológicas conservadas)</label>
+            </div>
+
+            <div id="sagitalSection" class="collapsible-section">
+                <div class="row">
+                    <div class="col form-group">
+                        <label>Cifosis Torácica (Introducir Grados º):</label>
+                        <input type="number" id="cifosis_deg" placeholder="Ej. 35 (Normal 20-45º)">
+                    </div>
+                    <div class="col form-group">
+                        <label>Lordosis Lumbar (Introducir Grados º):</label>
+                        <input type="number" id="lordosis_deg" placeholder="Ej. 50 (Normal 40-60º)">
+                    </div>
+                </div>
+            </div>
+
+            <h2>5. Parámetros Adicionales</h2>
+            <div class="row">
+                <div class="col form-group">
+                    <label>Signo de Risser (Madurez Esquelética):</label>
+                    <select id="risser">
+                        <option value="No valorable / Adulto">No valorable / Adulto (Ocultar en informe)</option>
+                        <option value="Risser 0">Risser 0</option><option value="Risser 1">Risser 1</option>
+                        <option value="Risser 2">Risser 2</option><option value="Risser 3">Risser 3</option>
+                        <option value="Risser 4">Risser 4</option><option value="Risser 5 (Fusión completa)">Risser 5</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Otros Hallazgos (Opcional):</label>
+                <textarea id="otros_hallazgos" rows="2" placeholder="Ej. Anomalías de transición lumbosacra, espondilólisis, signos de artrosis facetaria, etc."></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn-primary" onclick="generateAndCopyReport()">Generar y Copiar Reporte</button>
+                <button type="button" class="btn-reset" onclick="resetForm()">Limpiar Formulario</button>
+            </div>
+            <div id="successMessage" class="success-msg">¡Informe copiado al portapapeles con éxito!</div>
+        </form>
+    </div>
+
+    <div class="guide-panel">
+        <h2 style="margin-top:0;">Guía de Medición (SERME / SRS)</h2>
+        
+        <h3>1. Plano Coronal (Normalidad < 10º)</h3>
+        <p><strong>Cobb:</strong> Intersección de líneas perpendiculares a los platillos de las vértebras límite.</p>
+        <img src="cobb.png" alt="Medición del Ángulo de Cobb" class="guide-img">
+        <img src="nashmoe.png" alt="Grados de rotación de Nash-Moe" class="guide-img">
+
+        <h3>2. Balance y Pelvis</h3>
+        <ul style="font-size: 0.9em; color: #cccccc;">
+            <li><strong>Plomada de C7:</strong> Debe caer sobre la línea sacra media (CSVL). Desviaciones >15 mm son significativas.</li>
+            <li><strong>Báscula Pélvica:</strong> Desnivel de crestas ilíacas.</li>
+        </ul>
+
+        <h3>3. Plano Sagital (Trazado y Gradación)</h3>
+        <p>Los ángulos en el plano sagital se miden mediante el método de Cobb modificado:</p>
+        <ul style="font-size: 0.9em; color: #cccccc;">
+            <li><strong>Cifosis Torácica (T2-T12):</strong> Se traza una línea tangente al platillo superior de T2 (o la vértebra más craneal visible) y otra al platillo inferior de T12.<br>
+            <em>Normal: 20º a 45º. (<20º Hipocifosis / >45º Hipercifosis).</em></li>
+            <li><strong>Lordosis Lumbar (L1-S1):</strong> Se traza una línea tangente al platillo superior de L1 y otra al platillo superior de S1.<br>
+            <em>Normal: 40º a 60º. (<40º Hipolordosis o Dorso plano / >60º Hiperlordosis).</em></li>
+        </ul>
+
+        <h3>4. Madurez (Signo de Risser)</h3>
+        <img src="risser.jpeg" alt="Grados de Risser" class="guide-img">
+    </div>
+</div>
+
+<script>
+    function initForm() {
+        toggleSections();
+        toggleSecondary();
+    }
+
+    function toggleSections() {
+        document.getElementById("coronalSection").style.display = document.getElementById("checkNormalCoronal").checked ? "none" : "block";
+        document.getElementById("balanceSection").style.display = document.getElementById("checkNormalBalance").checked ? "none" : "block";
+        document.getElementById("sagitalSection").style.display = document.getElementById("checkNormalSagital").checked ? "none" : "block";
+    }
+
+    function toggleSecondary() {
+        document.getElementById("secondaryCurveSection").style.display = document.getElementById("checkSecondaryCurve").checked ? "block" : "none";
+    }
+
+    function resetForm() {
+        document.getElementById("scoliosisForm").reset();
+        document.getElementById("checkNormalCoronal").checked = true;
+        document.getElementById("checkNormalBalance").checked = true;
+        document.getElementById("checkNormalSagital").checked = true;
+        document.getElementById("checkSecondaryCurve").checked = false;
+        initForm();
+    }
+
+    function gradeSagital(cifosisDeg, lordosisDeg) {
+        let res = { cifosisText: "No valorada", lordosisText: "No valorada" };
+        
+        if (!isNaN(cifosisDeg) && cifosisDeg !== "") {
+            if (cifosisDeg < 20) res.cifosisText = `${cifosisDeg}º (Hipocifosis / Anormal)`;
+            else if (cifosisDeg > 45) res.cifosisText = `${cifosisDeg}º (Hipercifosis / Anormal)`;
+            else res.cifosisText = `${cifosisDeg}º (Normal)`;
+        }
+        
+        if (!isNaN(lordosisDeg) && lordosisDeg !== "") {
+            if (lordosisDeg < 40) res.lordosisText = `${lordosisDeg}º (Hipolordosis - Dorso plano / Anormal)`;
+            else if (lordosisDeg > 60) res.lordosisText = `${lordosisDeg}º (Hiperlordosis / Anormal)`;
+            else res.lordosisText = `${lordosisDeg}º (Normal)`;
+        }
+        return res;
+    }
+
+    function generateAndCopyReport() {
+        const proyecciones = document.getElementById('proyecciones').value;
+        const risser = document.getElementById('risser').value;
+        const otrosHallazgos = document.getElementById('otros_hallazgos').value.trim();
+
+        let reporte = `INFORME DE ESCOLIOGRAMA\n`;
+        reporte += `========================\n\n`;
+        reporte += `TÉCNICA:\n${proyecciones}.\n\n`;
+
+        // 1. CORONAL
+        reporte += `EVALUACIÓN PLANO CORONAL:\n`;
+        if (document.getElementById('checkNormalCoronal').checked) {
+            reporte += `- Eje espinal: Alineación conservada, sin objetivarse desviaciones escolióticas estructuradas (Cobb < 10º).\n`;
+        } else {
+            const u1 = document.getElementById('ubicacion_1').value;
+            const c1 = document.getElementById('convexidad_1').value;
+            const cobb1 = document.getElementById('cobb_1').value || "[No esp]";
+            reporte += `- Curva Principal: ${u1} de convexidad ${c1}. Límites ${document.getElementById('limite_sup_1').value || "?"} a ${document.getElementById('limite_inf_1').value || "?"} (Vértice ${document.getElementById('apical_1').value || "?"}). Ángulo de Cobb: ${cobb1}º. Rotación: ${document.getElementById('rotacion_1').value}.\n`;
+
+            if (document.getElementById('checkSecondaryCurve').checked) {
+                const u2 = document.getElementById('ubicacion_2').value;
+                const c2 = document.getElementById('convexidad_2').value;
+                const cobb2 = document.getElementById('cobb_2').value || "[No esp]";
+                reporte += `- Curva Secundaria: ${u2} de convexidad ${c2}. Límites ${document.getElementById('limite_sup_2').value || "?"} a ${document.getElementById('limite_inf_2').value || "?"} (Vértice ${document.getElementById('apical_2').value || "?"}). Ángulo de Cobb: ${cobb2}º. Rotación: ${document.getElementById('rotacion_2').value}.\n`;
+            }
+        }
+
+        // 2. BALANCE Y PELVIS
+        reporte += `\nBALANCE GLOBAL Y PELVIS:\n`;
+        if (document.getElementById('checkNormalBalance').checked) {
+            reporte += `- Balance global espinopélvico compensado (Plomada C7 centrada). Pelvis nivelada.\n`;
+        } else {
+            const eje = document.getElementById('eje_coronal').value;
+            const eje_mm = document.getElementById('eje_mm').value;
+            const bascula = document.getElementById('bascula_estado').value;
+            const bascula_mm = document.getElementById('bascula_mm').value;
+            
+            reporte += `- Alineación eje occipito-sacro: ${eje}${eje_mm && eje !== "Centrado (Compensado)" ? ' (' + eje_mm + ' mm)' : ''}.\n`;
+            reporte += `- Báscula pélvica: ${bascula}${bascula_mm && bascula !== "Pelvis nivelada" ? ' en ' + bascula_mm + ' mm' : ''}.\n`;
+        }
+
+        // 3. SAGITAL
+        reporte += `\nEVALUACIÓN PLANO SAGITAL:\n`;
+        if (document.getElementById('checkNormalSagital').checked) {
+            reporte += `- Cifosis torácica y lordosis lumbar dentro de la normalidad fisiológica.\n`;
+        } else {
+            const c_deg = parseInt(document.getElementById('cifosis_deg').value);
+            const l_deg = parseInt(document.getElementById('lordosis_deg').value);
+            const grades = gradeSagital(c_deg, l_deg);
+            
+            reporte += `- Cifosis torácica: ${grades.cifosisText}.\n`;
+            reporte += `- Lordosis lumbar: ${grades.lordosisText}.\n`;
+        }
+        
+        // 4. MADUREZ ESQUELÉTICA (Solo si procede)
+        if (risser !== "No valorable / Adulto") {
+            reporte += `\nMADUREZ ESQUELÉTICA:\n`;
+            reporte += `- Signo de Risser: ${risser}.\n`;
+        }
+
+        // 5. OTROS HALLAZGOS (Solo si se han introducido)
+        if (otrosHallazgos !== "") {
+            reporte += `\nOTROS HALLAZGOS:\n`;
+            reporte += `${otrosHallazgos}\n`;
+        }
+
+        // 6. CONCLUSIÓN
+        reporte += `\nCONCLUSIÓN:\n`;
+        if (document.getElementById('checkNormalCoronal').checked && document.getElementById('checkNormalBalance').checked && document.getElementById('checkNormalSagital').checked) {
+            reporte += `Estudio radiológico de columna total sin alteraciones significativas.\n`;
+        } else if (!document.getElementById('checkNormalCoronal').checked) {
+            reporte += `Escoliosis con curva principal ${document.getElementById('ubicacion_1').value} de ${document.getElementById('cobb_1').value || "?"}º.\n`;
+        } else {
+            reporte += `Alteraciones del balance y/o eje sagital detalladas en el informe.\n`;
+        }
+
+        // COPIAR AL PORTAPAPELES
+        navigator.clipboard.writeText(reporte).then(() => {
+            const msg = document.getElementById('successMessage');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 3000);
+        }).catch(err => {
+            alert('Error al copiar al portapapeles.');
+            console.error('Error:', err);
+        });
+    }
+</script>
+
+</body>
+</html>
