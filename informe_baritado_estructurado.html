@@ -39,7 +39,7 @@
 
         .layout-container {
             display: grid;
-            grid-template-columns: 1fr 350px;
+            grid-template-columns: 1fr 380px; /* Ligeramente más ancho para el PDF */
             gap: 20px;
             max-width: 1600px;
             margin: 0 auto;
@@ -65,6 +65,8 @@
             height: fit-content;
             position: sticky;
             top: 20px;
+            max-height: 95vh;
+            overflow-y: auto; /* Permite scroll si la columna se hace muy larga con el PDF */
         }
 
         h1 {
@@ -254,6 +256,35 @@
             background-position: center;
             background-repeat: no-repeat;
         }
+        
+        .pdf-frame {
+            width: 100%;
+            height: 500px;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            display: none; /* Oculto por defecto */
+            background-color: white; /* Para asegurar correcta visibilidad de PDFs */
+        }
+        
+        .link-interes {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            padding: 8px;
+            background-color: var(--input-bg);
+            border-radius: 4px;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        
+        .link-interes:hover {
+            border-color: var(--accent-blue);
+        }
 
         .toast {
             position: fixed;
@@ -267,6 +298,21 @@
             font-size: 14px;
             display: none;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+        }
+        
+        /* Modificamos el scrollbar de la columna derecha para que sea más sutil */
+        .sidebar-column::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar-column::-webkit-scrollbar-track {
+            background: var(--bg-color); 
+        }
+        .sidebar-column::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 10px;
+        }
+        .sidebar-column::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
         }
     </style>
 </head>
@@ -571,6 +617,30 @@
         </div>
 
         <div class="sidebar-column">
+            
+            <!-- NUEVA SECCIÓN DE RECURSOS -->
+            <h2>📚 Recursos y Consulta</h2>
+            <div class="image-slots" style="margin-bottom: 25px;">
+                
+                <div class="image-card">
+                    <label style="font-size: 13px; font-weight: bold; color: var(--text-main); margin-bottom: 5px; display: block;">Documentos Clínicos (PDF)</label>
+                    <button class="secondary" onclick="togglePDF('pdf_seram')" style="width: 100%; font-size: 12px; padding: 8px;">📄 Mostrar/Ocultar: Artículo SERAM</button>
+                    
+                    <iframe id="pdf_seram" class="pdf-frame" src="https://www.piper.espacio-seram.com/index.php/seram/article/view/10214/8680"></iframe>
+                    
+                    <a href="https://www.piper.espacio-seram.com/index.php/seram/article/view/10214/8680" target="_blank" style="font-size: 11px; color: var(--text-muted); text-decoration: underline; display: block; text-align: center; margin-top: 8px;">Abrir PDF en pestaña nueva</a>
+                </div>
+
+                <div class="image-card">
+                    <label style="font-size: 13px; font-weight: bold; color: var(--text-main); margin-bottom: 5px; display: block;">Enlaces de Interés</label>
+                    <a href="https://radiologyassistant.nl/chest/esophagus/esophagus-i-anatomy-rings-inflammation" target="_blank" class="link-interes">
+                        🔗 Radiology Assistant: Esophagus I
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- SECCIÓN EXISTENTE DE IMÁGENES -->
             <h2>🖼️ Soporte de Imágenes</h2>
             <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 15px;">Añade enlaces URL de imágenes de referencia (PACS/Web) para tenerlas accesibles en el panel lateral.</p>
             
@@ -594,6 +664,16 @@
     <div id="toast" class="toast">¡Informe copiado al portapapeles con éxito!</div>
 
     <script>
+        // Función para mostrar/ocultar el PDF
+        function togglePDF(id) {
+            const frame = document.getElementById(id);
+            if (frame.style.display === 'none' || frame.style.display === '') {
+                frame.style.display = 'block';
+            } else {
+                frame.style.display = 'none';
+            }
+        }
+
         function toggleSecciones() {
             const tipoEstudio = document.getElementById('tipo_estudio').value;
             const secTegd = document.getElementById('sec_tegd_campos');
@@ -673,14 +753,22 @@
             const hPres = document.querySelector('input[name="hernia_presencia"]:checked').value === 'si';
             const rPres = document.querySelector('input[name="reflujo_presencia"]:checked').value === 'si';
 
-            let texto = `INFORME DE RADIOLOGÍA - ESTUDIO CONTRASTADO\n`;
-            texto += `===============================================\n`;
-            texto += `EXPLORACIÓN: ${tipoEstudio}\n`;
-            texto += `TÉCNICA: Administración de ${contraste}.\n`;
-            texto += `INDICACIÓN: ${indicacion}\n\n`;
+            let texto = `INFORME DE RADIOLOGÍA - ESTUDIO CONTRASTADO
+`;
+            texto += `===============================================
+`;
+            texto += `EXPLORACIÓN: ${tipoEstudio}
+`;
+            texto += `TÉCNICA: Administración de ${contraste}.
+`;
+            texto += `INDICACIÓN: ${indicacion}
+
+`;
             
-            texto += `HALLAZGOS:\n`;
-            texto += `- Fase faringoesofágica: ${faseOral}\n`;
+            texto += `HALLAZGOS:
+`;
+            texto += `- Fase faringoesofágica: ${faseOral}
+`;
 
             const esofagoNormal = (motilidadVal === 'normal' && mucosaVal === 'normal');
             
@@ -711,23 +799,30 @@
             }
 
             if (esofagoNormal) {
-                texto += `- Esófago y Unión Gastroesofágica: Esófago de calibre, tamaño, disposición y peristalsis normales. ${fraseUGE}\n`;
+                texto += `- Esófago y Unión Gastroesofágica: Esófago de calibre, tamaño, disposición y peristalsis normales. ${fraseUGE}
+`;
             } else {
                 let motilidadTexto = motilidadVal === 'terciarias' ? "Presencia de ondas terciarias no propulsivas" : "Aperistalsis completa del cuerpo esofágico";
                 let mucosaTexto = mucosaVal === 'estenosis' ? "Estenosis de márgenes regulares en tercio distal" : (mucosaVal === 'defecto' ? "Defecto de repleción focal de aspecto polipoideo/masa" : "Divertículo por pulsión");
                 
-                texto += `- Cuerpo esofágico (Motilidad): ${motilidadTexto}\n`;
-                texto += `- Morfología y mucosa: ${mucosaTexto}\n`;
-                texto += `- Unión Gastroesofágica y Hiato: ${fraseUGE}\n`;
+                texto += `- Cuerpo esofágico (Motilidad): ${motilidadTexto}
+`;
+                texto += `- Morfología y mucosa: ${mucosaTexto}
+`;
+                texto += `- Unión Gastroesofágica y Hiato: ${fraseUGE}
+`;
             }
 
             if (isPost) {
                 const tipoCirugia = document.getElementById('tipo_cirugia').options[document.getElementById('tipo_cirugia').selectedIndex].text;
-                texto += `\n[VALORACIÓN POSTQUIRÚRGICA / INTERVENCIONISMO - ${tipoCirugia.toUpperCase()}]\n`;
+                texto += `
+[VALORACIÓN POSTQUIRÚRGICA / INTERVENCIONISMO - ${tipoCirugia.toUpperCase()}]
+`;
                 
                 const tipoCirugiaVal = document.getElementById('tipo_cirugia').value;
                 if (tipoCirugiaVal === 'poems') {
-                    texto += `- Paso por la UGE: ${document.getElementById('poems_uge').value}\n`;
+                    texto += `- Paso por la UGE: ${document.getElementById('poems_uge').value}
+`;
                     
                     // Lógica del minutado dinámico
                     const pTiempo = document.getElementById('poems_tiempo').value || "5";
@@ -740,15 +835,20 @@
                         const txtCol = pCol ? `, con una columna residual de ${pCol} cm` : "";
                         txtMinutado = `Retención significativa de contraste en el esófago torácico a los ${pTiempo} minutos${txtCol}.`;
                     }
-                    texto += `- Estudio minutado: ${txtMinutado}\n`;
+                    texto += `- Estudio minutado: ${txtMinutado}
+`;
                     
                 } else if (tipoCirugiaVal === 'antirreflujo') {
-                    texto += `- Morfología de la funduplicatura: ${document.getElementById('ni_manguito').value}\n`;
-                    texto += `- Paso del contraste: ${document.getElementById('ni_paso').value}\n`;
+                    texto += `- Morfología de la funduplicatura: ${document.getElementById('ni_manguito').value}
+`;
+                    texto += `- Paso del contraste: ${document.getElementById('ni_paso').value}
+`;
                 } else if (tipoCirugiaVal === 'bariátrica_sleeve') {
-                    texto += `- Morfología del eje gástrico: ${document.getElementById('sl_morfologia').value}\n`;
+                    texto += `- Morfología del eje gástrico: ${document.getElementById('sl_morfologia').value}
+`;
                 } else if (tipoCirugiaVal === 'bariátrica_bypass') {
-                    texto += `- Evaluación del Pouch y anastomosis: ${document.getElementById('by_pouch').value}\n`;
+                    texto += `- Evaluación del Pouch y anastomosis: ${document.getElementById('by_pouch').value}
+`;
                 }
 
                 const f = document.getElementById('comp_fuga').checked;
@@ -759,20 +859,30 @@
                     texto += `- 🚨 COMPLICACIÓN DETECTADA: `;
                     if (f) texto += `[Extravasación/Fuga de contraste] `;
                     if (fi) texto += `[Trayecto fistuloso] `;
-                    if (det) texto += `\n  Detalles: ${det}\n`;
-                    else texto += `\n`;
+                    if (det) texto += `
+  Detalles: ${det}
+`;
+                    else texto += `
+`;
                 } else {
-                    texto += `- Exclusión de complicaciones: No se observan fugas de contraste ni trayectos fistulosos en la exploración actual.\n`;
+                    texto += `- Exclusión de complicaciones: No se observan fugas de contraste ni trayectos fistulosos en la exploración actual.
+`;
                 }
             }
 
             if (document.getElementById('tipo_estudio').value === 'tegd') {
-                texto += `\n[EVALUACIÓN GÁSTRICA Y DUODENAL (TEGD)]\n`;
-                texto += `- Estómago: ${document.getElementById('tegd_estomago').value}\n`;
-                texto += `- Duodeno: ${document.getElementById('tegd_duodeno').value}\n`;
+                texto += `
+[EVALUACIÓN GÁSTRICA Y DUODENAL (TEGD)]
+`;
+                texto += `- Estómago: ${document.getElementById('tegd_estomago').value}
+`;
+                texto += `- Duodeno: ${document.getElementById('tegd_duodeno').value}
+`;
             }
 
-            texto += `\nIMPRESIÓN DIAGNÓSTICA:\n`;
+            texto += `
+IMPRESIÓN DIAGNÓSTICA:
+`;
             texto += `${document.getElementById('conclusion').value}`;
 
             document.getElementById('informe_output').textContent = texto;
@@ -804,7 +914,6 @@
             document.getElementById('reflujo_tipo').value = "espontáneo";
             document.getElementById('reflujo_medida').value = "";
             
-            // Reset POEMS
             document.getElementById('poems_tiempo').value = "5";
             document.getElementById('poems_aclaramiento').value = "completo";
             document.getElementById('poems_columna').value = "";
