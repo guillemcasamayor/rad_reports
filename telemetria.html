@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Estructurado - Telemetría de MMII</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #020617; /* Negro azulado profundo */
+            color: #f8fafc; /* Blanco base */
+        }
+
+        .guide-scroll { 
+            max-height: calc(100vh - 40px); 
+            overflow-y: auto; 
+        }
+
+        input[type="number"], select, textarea { 
+            background-color: #0f172a; 
+            border: 1px solid #1e3a8a; 
+            color: #f1f5f9;
+            width: 100%; 
+            border-radius: 0.5rem; 
+            padding: 0.6rem; 
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus { 
+            outline: none; 
+            border-color: #3b82f6;
+            background-color: #020617;
+        }
+
+        .card-container {
+            background: #0f172a;
+            border: 1px solid #1e3a8a;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        label.section-label { 
+            display: block; 
+            font-size: 0.7rem; 
+            font-weight: 700; 
+            color: #94a3b8; 
+            margin-bottom: 0.4rem; 
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .title-main { color: #3b82f6; } 
+        .title-section { color: #1d4ed8; border-left: 4px solid #1d4ed8; padding-left: 0.75rem; }
+        .text-result { color: #60a5fa; font-family: monospace; font-size: 0.85rem; line-height: 1.4; }
+
+        .tutorial-box {
+            background-color: #1e293b;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+
+        .xray-reference {
+            background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            border: 2px solid #1e3a8a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Custom Radio Buttons */
+        .radio-btn-group input[type="radio"] { display: none; }
+        .radio-btn-group label {
+            cursor: pointer;
+            padding: 0.4rem 1rem;
+            border: 1px solid #1e3a8a;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94a3b8;
+            transition: all 0.2s;
+            background-color: #0f172a;
+        }
+        .radio-btn-group input[type="radio"]:checked + label {
+            background-color: #1d4ed8;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #1e40af; border-radius: 10px; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        
+        <!-- COLUMNA IZQUIERDA: MÓDULO DE INFORME -->
+        <div class="w-full md:w-1/2 p-8 border-r border-blue-900/30 guide-scroll">
+            <header class="mb-8 flex justify-between items-end">
+                <div>
+                    <h1 class="text-3xl font-extrabold title-main">Telemetría MMII</h1>
+                    <p class="text-xs text-blue-400 font-semibold tracking-widest uppercase mt-1">Informe Estructurado - Protocolo MSK</p>
+                </div>
+                
+                <!-- Selector de Idioma -->
+                <div class="radio-btn-group flex gap-2">
+                    <div>
+                        <input type="radio" id="lang-es" name="language" value="es" checked>
+                        <label for="lang-es">ES</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="lang-ca" name="language" value="ca">
+                        <label for="lang-ca">CA</label>
+                    </div>
+                </div>
+            </header>
+
+            <form id="telemetriaForm">
+                
+                <!-- 1. Longitudes -->
+                <section class="mb-8">
+                    <h2 class="text-sm font-bold title-section mb-6 uppercase tracking-wider">01. Estudio de Dismetría</h2>
+                    <div class="card-container mb-0">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="section-label">Longitud Derecha (mm)</label>
+                                <input type="number" id="longD" placeholder="Cabeza femoral a astrágalo">
+                            </div>
+                            <div>
+                                <label class="section-label">Longitud Izquierda (mm)</label>
+                                <input type="number" id="longI" placeholder="Cabeza femoral a astrágalo">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Báscula Pélvica -->
+                <section class="mb-8">
+                    <h2 class="text-sm font-bold title-section mb-6 uppercase tracking-wider">02. Báscula Pélvica</h2>
+                    <div class="card-container mb-0">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="section-label">Diferencia de altura (mm)</label>
+                                <input type="number" id="basculaMM" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="section-label">Lado descendido</label>
+                                <select id="ladoBascula">
+                                    <option value="none">Ninguno / Simétrico</option>
+                                    <option value="D">Derecho / Dret</option>
+                                    <option value="I">Izquierdo / Esquerre</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Alineación (Eje Mecánico) -->
+                <section class="mb-8">
+                    <h2 class="text-sm font-bold title-section mb-6 uppercase tracking-wider">03. Alineación Coronal (Eje Mecánico)</h2>
+                    
+                    <div class="tutorial-box">
+                        <span class="font-bold text-blue-400 uppercase block mb-1 text-[10px]">Tutorial de trazado de Eje Mecánico:</span>
+                        Se traza el primer segmento desde el <strong>centro de la cabeza femoral</strong> hasta el <strong>punto medio de la interlínea articular</strong> (rodilla). El segundo segmento sigue el <strong>eje medio de la diáfisis tibial</strong>.
+                    </div>
+
+                    <div class="card-container mb-0">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="section-label">Ángulo Visor Derecho (°)</label>
+                                <input type="number" id="hkaD" step="0.1" placeholder="Ej: 176.0">
+                                <p class="text-[9px] text-gray-500 mt-1">Valor absoluto medido en PACS</p>
+                            </div>
+                            <div>
+                                <label class="section-label">Ángulo Visor Izquierdo (°)</label>
+                                <input type="number" id="hkaI" step="0.1" placeholder="Ej: 184.5">
+                                <p class="text-[9px] text-gray-500 mt-1">Valor absoluto medido en PACS</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Previsualización del Informe -->
+                <section class="mb-4">
+                    <h2 class="text-sm font-bold title-section mb-4 uppercase tracking-wider">04. Previsualización del Informe</h2>
+                    <div class="relative">
+                        <textarea id="informeFinal" rows="8" class="font-mono text-sm leading-relaxed bg-black/60 border-blue-900/60 p-4" readonly placeholder="Introduzca los valores en los campos superiores para generar el texto del informe automáticamente..."></textarea>
+                        
+                        <!-- Notificación de copiado -->
+                        <div id="copyToast" class="absolute top-4 right-4 bg-green-600 text-white text-[10px] font-bold px-3 py-1 rounded opacity-0 transition-opacity duration-300">
+                            ¡Copiado!
+                        </div>
+                    </div>
+                </section>
+
+                <button type="button" id="btnCopiar" class="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-blue-900/20 uppercase tracking-widest text-xs">
+                    Copiar informe al portapapeles
+                </button>
+            </form>
+        </div>
+
+        <!-- COLUMNA DERECHA: GUÍA DE REFERENCIA -->
+        <div class="w-full md:w-1/2 p-8 bg-slate-950/50 guide-scroll border-l border-blue-900/10">
+            <h2 class="text-xl font-bold title-main mb-8 flex items-center">
+                <svg class="w-6 h-6 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Guía Visual de Trazado
+            </h2>
+
+            <!-- Referencia de Medición de Longitud -->
+            <div class="xray-reference p-6 rounded-2xl mb-8 shadow-2xl">
+                <h3 class="text-xs font-bold text-blue-300 mb-6 tracking-widest uppercase border-b border-blue-900/20 pb-2">1. Medición de Longitud</h3>
+                
+                <div class="flex flex-col items-center">
+                    <div class="relative w-48 h-96 border border-blue-500/20 bg-black/40 rounded">
+                        <svg width="100%" height="100%" viewBox="0 0 100 250">
+                            <!-- Esquema Óseo -->
+                            <path d="M30 10 Q50 0 70 10 L80 30 Q50 40 20 30 Z" fill="#334155" opacity="0.4"/> 
+                            <circle cx="50" cy="35" r="12" fill="#334155" opacity="0.6" /> 
+                            <path d="M50 35 L50 150" stroke="#475569" stroke-width="8" stroke-linecap="round"/> 
+                            <path d="M40 155 H60" stroke="#475569" stroke-width="5" stroke-linecap="round"/> 
+                            <path d="M50 160 L50 230" stroke="#475569" stroke-width="7" stroke-linecap="round"/> 
+                            <path d="M40 235 Q50 245 60 235" fill="#334155" opacity="0.6"/> 
+
+                            <!-- Líneas de Medición -->
+                            <g stroke="#3b82f6" stroke-width="1.5">
+                                <line x1="25" y1="23" x2="75" y2="23" stroke-dasharray="3"/>
+                                <text x="80" y="25" fill="#3b82f6" font-size="6" font-weight="bold">Cúpula Femoral</text>
+                                
+                                <line x1="25" y1="235" x2="75" y2="235" stroke-dasharray="3"/>
+                                <text x="80" y="237" fill="#3b82f6" font-size="6" font-weight="bold">Astrágalo</text>
+
+                                <line x1="35" y1="23" x2="35" y2="235" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+                                <text x="20" y="130" fill="#3b82f6" font-size="8" font-weight="bold" transform="rotate(-90 20,130)">Longitud (mm)</text>
+                            </g>
+                            
+                            <defs>
+                                <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                                    <path d="M0,0 L10,5 L0,10 Z" fill="#3b82f6" />
+                                </marker>
+                            </defs>
+                        </svg>
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-4 text-center px-4">
+                        Punto más craneal de la cabeza femoral → Línea media del astrágalo.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Referencia de Trazado de Eje Mecánico -->
+             <div class="xray-reference p-6 rounded-2xl mb-8 shadow-2xl">
+                <h3 class="text-xs font-bold text-blue-300 mb-6 tracking-widest uppercase border-b border-blue-900/20 pb-2">2. Trazado del Eje Mecánico</h3>
+                
+                <div class="flex flex-col items-center">
+                    <div class="relative w-52 h-80 border border-blue-500/20 bg-black/40 rounded">
+                        <svg width="100%" height="100%" viewBox="0 0 100 200">
+                            <!-- Esqueleto radiológico simplificado -->
+                            <path d="M45 10 Q50 5 55 10 L60 25 Q50 30 40 25 Z" fill="#334155" opacity="0.3"/> 
+                            <path d="M50 30 L50 100" stroke="#475569" stroke-width="6" stroke-linecap="round"/> 
+                            <path d="M40 105 H60" stroke="#475569" stroke-width="4" stroke-linecap="round"/> 
+                            <path d="M50 110 L55 180" stroke="#475569" stroke-width="5" stroke-linecap="round"/> 
+
+                            <!-- El Trazado de Ángulo -->
+                            <g stroke="#3b82f6" stroke-width="1.5" fill="none">
+                                <circle cx="50" cy="18" r="3" stroke="#f43f5e" stroke-width="2" fill="white"/> 
+                                <circle cx="50" cy="103" r="3" stroke="#f43f5e" stroke-width="2" fill="white"/> 
+                                <line x1="50" y1="18" x2="50" y2="103" stroke="#f43f5e" /> 
+                                
+                                <line x1="50" y1="103" x2="55" y2="180" stroke="#3b82f6" stroke-dasharray="3"/> 
+                                <circle cx="55" cy="180" r="3" stroke="#3b82f6" stroke-width="2" fill="white"/> 
+                            </g>
+
+                            <text x="56" y="20" fill="#f43f5e" font-size="5" font-weight="bold">1. Centro cabeza femoral</text>
+                            <text x="56" y="105" fill="#f43f5e" font-size="5" font-weight="bold">2. Interlínea rodilla</text>
+                            <text x="60" y="182" fill="#3b82f6" font-size="5" font-weight="bold">3. Eje diáfisis tibial</text>
+                        </svg>
+
+                        <div class="absolute top-2 right-2 text-[10px] text-red-500 font-bold font-mono">
+                            Visor: 175.5°
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de Lógica Clínica -->
+            <div class="space-y-4">
+                <div class="bg-slate-900 border border-blue-900/30 p-5 rounded-2xl shadow-xl">
+                    <h3 class="text-[10px] font-bold text-blue-400 uppercase mb-4 tracking-widest">Interpretación del Eje</h3>
+                    <div class="space-y-4 text-[11px] text-gray-400">
+                        <div class="p-3 bg-red-950/20 border border-red-900/20 rounded-lg">
+                            <span class="text-red-400 font-bold block mb-1 uppercase">Genu Varo (< 180°)</span>
+                            Se informa como "Genu varo de X grados" (ó "Genu varum" en CA). Nunca se añade la palabra "significativo".
+                        </div>
+                        <div class="p-3 bg-blue-900/20 border border-blue-800/20 rounded-lg">
+                            <span class="text-blue-400 font-bold block mb-1 uppercase">Genu Valgo (> 180°)</span>
+                            Se informa como "Fisiológico" si desviación < 5°. <br>
+                            Si es ≥ 5°, se informa sólo como "Genu valgo de X grados" (ó "Genu valgum" en CA), sin usar "significativo".
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer class="mt-12 text-center text-[9px] text-slate-700 uppercase tracking-widest">
+                Radiología Musculoesquelética - Informe Estructurado
+            </footer>
+        </div>
+
+    </div>
+
+    <script>
+        // DICCIONARIOS DE IDIOMAS
+        const i18n = {
+            es: {
+                dism_none: "Sin dismetría significativa en miembros inferiores.",
+                dism_sig: (lado, mm) => `Dismetría significativa de ${mm} mm en miembro inferior ${lado}.`,
+                lado_d: "derecho",
+                lado_i: "izquierdo",
+                basc_none: "Sin báscula pélvica significativa.",
+                basc_sig: (lado, mm) => `Báscula pélvica significativa de ${mm} mm con descenso del lado ${lado}.`,
+                eje_title: "EJE MECÁNICO Y ALINEACIÓN:",
+                neutro: "Alineación mecánica neutra.",
+                varo: (deg) => `Genu varo de ${deg}°`,
+                valgo_fisio: (deg) => `Genu valgo fisiológico de ${deg}°`,
+                valgo_sig: (deg) => `Genu valgo de ${deg}°`
+            },
+            ca: {
+                dism_none: "Sense dismetria significativa en membres inferiors.",
+                dism_sig: (lado, mm) => `Dismetria significativa de ${mm} mm en membre inferior ${lado}.`,
+                lado_d: "dret",
+                lado_i: "esquerre",
+                basc_none: "Sense bàscula pelviana significativa.",
+                basc_sig: (lado, mm) => `Bàscula pelviana significativa de ${mm} mm amb descens del costat ${lado}.`,
+                eje_title: "EIX MECÀNIC I ALINEACIÓ:",
+                neutro: "Alineació mecànica neutra.",
+                varo: (deg) => `Genu varum de ${deg}°`,
+                valgo_fisio: (deg) => `Genu valgum fisiològic de ${deg}°`,
+                valgo_sig: (deg) => `Genu valgum de ${deg}°`
+            }
+        };
+
+        // ELEMENTOS DEL DOM
+        const fields = {
+            longD: document.getElementById('longD'),
+            longI: document.getElementById('longI'),
+            basculaMM: document.getElementById('basculaMM'),
+            ladoBascula: document.getElementById('ladoBascula'),
+            hkaD: document.getElementById('hkaD'),
+            hkaI: document.getElementById('hkaI'),
+            radiosLang: document.querySelectorAll('input[name="language"]'),
+            informeFinal: document.getElementById('informeFinal'),
+            btnCopiar: document.getElementById('btnCopiar'),
+            copyToast: document.getElementById('copyToast')
+        };
+
+        // FUNCIÓN PRINCIPAL DE ACTUALIZACIÓN
+        function generarInforme() {
+            // Determinar idioma actual
+            const lang = document.querySelector('input[name="language"]:checked').value;
+            const text = i18n[lang];
+
+            let lineasInforme = [];
+            let hayDatos = false;
+
+            // 1. DISMETRÍA
+            const lD = parseFloat(fields.longD.value);
+            const lI = parseFloat(fields.longI.value);
+            
+            if (!isNaN(lD) && !isNaN(lI) && lD > 0 && lI > 0) {
+                hayDatos = true;
+                const diff = lD - lI;
+                const absDiff = Math.abs(diff);
+                
+                if (absDiff < 5) {
+                    lineasInforme.push(text.dism_none);
+                } else {
+                    const lado = diff > 0 ? text.lado_d : text.lado_i;
+                    lineasInforme.push(text.dism_sig(lado, absDiff));
+                }
+            }
+
+            // 2. BÁSCULA
+            const bMM = parseFloat(fields.basculaMM.value) || 0;
+            const bLado = fields.ladoBascula.value;
+
+            if (bMM > 0 || bLado !== "none") {
+                hayDatos = true;
+                if (bMM < 5 || bLado === "none") {
+                    lineasInforme.push(text.basc_none);
+                } else {
+                    const ladoTxt = bLado === "D" ? text.lado_d : text.lado_i;
+                    lineasInforme.push(text.basc_sig(ladoTxt, bMM));
+                }
+            }
+
+            // 3. EJE MECÁNICO
+            const eD = parseFloat(fields.hkaD.value);
+            const eI = parseFloat(fields.hkaI.value);
+
+            function interpretarEje(val) {
+                if (isNaN(val)) return null;
+                const desviacion = Math.abs(180 - val).toFixed(1);
+                
+                if (val === 180) return text.neutro;
+                
+                if (val < 180) {
+                    // Varo (siempre "de X grados", nunca "significativo")
+                    return text.varo(desviacion);
+                } else {
+                    // Valgo (Fisiológico si <5, normal sin "significativo" si >=5)
+                    if (desviacion < 5) {
+                        return text.valgo_fisio(desviacion);
+                    } else {
+                        return text.valgo_sig(desviacion);
+                    }
+                }
+            }
+
+            const resD = interpretarEje(eD);
+            const resI = interpretarEje(eI);
+
+            if (resD || resI) {
+                hayDatos = true;
+                lineasInforme.push(""); // Espacio
+                lineasInforme.push(text.eje_title);
+                
+                const labelD = lang === 'es' ? 'Derecho' : 'Dret';
+                const labelI = lang === 'es' ? 'Izquierdo' : 'Esquerre';
+
+                if (resD) lineasInforme.push(`- ${labelD}: ${resD}`);
+                if (resI) lineasInforme.push(`- ${labelI}: ${resI}`);
+            }
+
+            // RENDER
+            if (hayDatos) {
+                fields.informeFinal.value = lineasInforme.join('\n');
+            } else {
+                fields.informeFinal.value = "";
+            }
+        }
+
+        // COPIAR AL PORTAPAPELES
+        fields.btnCopiar.addEventListener('click', () => {
+            if (fields.informeFinal.value.trim() === "") return;
+            
+            fields.informeFinal.select();
+            document.execCommand('copy');
+            
+            // Animación Toast
+            fields.copyToast.style.opacity = '1';
+            setTimeout(() => {
+                fields.copyToast.style.opacity = '0';
+            }, 2000);
+            
+            // Deseleccionar
+            window.getSelection().removeAllRanges();
+        });
+
+        // ASIGNAR EVENTOS
+        ['input', 'change'].forEach(evt => {
+            fields.longD.addEventListener(evt, generarInforme);
+            fields.longI.addEventListener(evt, generarInforme);
+            fields.basculaMM.addEventListener(evt, generarInforme);
+            fields.ladoBascula.addEventListener(evt, generarInforme);
+            fields.hkaD.addEventListener(evt, generarInforme);
+            fields.hkaI.addEventListener(evt, generarInforme);
+        });
+
+        fields.radiosLang.forEach(radio => {
+            radio.addEventListener('change', generarInforme);
+        });
+
+    </script>
+</body>
+</html>
